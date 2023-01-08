@@ -2,6 +2,7 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
+import tactJs, { PositionType } from "tact-js";
 
 class App {
     constructor() {
@@ -34,6 +35,33 @@ class App {
                 } else {
                     scene.debugLayer.show();
                 }
+            }
+        });
+
+        var key = 'dot';
+        var position = PositionType.VestFront;
+        var points = [{
+            index: 10,
+            intensity: 100
+        }];
+        var durationMillis = 1000; // 1000ms
+
+        console.log("starting tactJs");
+        tactJs.addListener(function (msg) {
+            if (msg.status === 'Connected') {
+                console.log('tact is connected');
+                var errorCode = tactJs.submitDot(key, position, points, durationMillis);
+                if (errorCode !== 0) {
+                    console.log('tact error: ' + errorCode);
+                }
+            } else if (msg.status === 'Disconnected') {
+                console.log('tact is disconnected');
+
+            } else if (msg.status === 'Connecting') {
+                console.log('tact is connecting');
+            }
+            else if (msg.status === 'Error') {
+                console.log('tact error: ' + msg);
             }
         });
 
