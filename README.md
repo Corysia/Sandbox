@@ -1,12 +1,12 @@
-# Basic - A Simple BabylonJS Example with TypesScript
+# Sandbox - Experimenting with BabylonJS and TypeScript
 
-- [Basic - A Simple BabylonJS Example with TypesScript](#basic---a-simple-babylonjs-example-with-typesscript)
+- [Sandbox - Experimenting with BabylonJS and TypeScript](#sandbox---experimenting-with-babylonjs-and-typescript)
   - [How to build](#how-to-build)
     - [Software Requirements](#software-requirements)
     - [Install dependencies](#install-dependencies)
     - [Build](#build)
 
-You can see the result [here](https://corysia.github.com/basic).
+You can see the result [here](https://corysia.github.com/Sandbox).
 
 ## How to build
 
