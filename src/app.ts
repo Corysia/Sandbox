@@ -17,6 +17,8 @@ class App {
         var engine = new Engine(canvas, true);
         var scene = new Scene(engine);
 
+        var tactJsRunning = false;
+
         var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
         camera.attachControl(canvas, true);
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
@@ -38,25 +40,22 @@ class App {
             }
         });
 
-        var key = 'dot';
-        var position = PositionType.VestFront;
-        var points = [{
-            index: 10,
-            intensity: 100
-        }];
-        var durationMillis = 1000; // 1000ms
+        if (!tactJs) {
+            console.log('tact is not supported');
+            return;
+        }
 
+        // Enable tactJs
         console.log("starting tactJs");
+        tactJs.turnOffAll();
+
         tactJs.addListener(function (msg) {
             if (msg.status === 'Connected') {
                 console.log('tact is connected');
-                var errorCode = tactJs.submitDot(key, position, points, durationMillis);
-                if (errorCode !== 0) {
-                    console.log('tact error: ' + errorCode);
-                }
+                tactJsRunning = true;
             } else if (msg.status === 'Disconnected') {
                 console.log('tact is disconnected');
-
+                tactJsRunning = false;
             } else if (msg.status === 'Connecting') {
                 console.log('tact is connecting');
             }
@@ -64,6 +63,21 @@ class App {
                 console.log('tact error: ' + msg);
             }
         });
+
+        // TODO: remove this - just testing
+        if (tactJsRunning) {
+            var key = 'dot';
+            var position = PositionType.VestFront;
+            var points = [{
+                index: 10,
+                intensity: 100
+            }];
+            var durationMillis = 1000; // 1000ms
+                var errorCode = tactJs.submitDot(key, position, points, durationMillis);
+            if (errorCode !== 0) {
+                console.log('tact error: ' + errorCode);
+            }
+        }
 
         // run the main render loop
         engine.runRenderLoop(() => {
