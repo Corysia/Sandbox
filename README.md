@@ -6,7 +6,6 @@
     - [Install dependencies](#install-dependencies)
     - [Build](#build)
 
-
 Try it out for yourself [here](https://corysia.github.io/Sandbox).
 
 ## How to build
