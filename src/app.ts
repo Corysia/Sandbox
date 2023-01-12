@@ -5,7 +5,6 @@ import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBu
 import tactJs, { PositionType } from "tact-js";
 
 class App {
-    tactJsRunning: boolean = false;
 
     constructor() {
         // create the canvas html element and attach it to the webpage
@@ -14,6 +13,12 @@ class App {
         canvas.style.height = "100%";
         canvas.id = "gameCanvas";
         document.body.appendChild(canvas);
+        new SpeechSynthesisUtterance();
+
+        document.onload = () => {
+            console.log("document loaded");
+            this.speech();
+        }
 
         // initialize babylon scene and engine
         var engine = new Engine(canvas, true);
@@ -38,6 +43,12 @@ class App {
                     scene.debugLayer.show();
                 }
             }
+            if (ev.keyCode === 32) {
+                this.hit();
+            }
+            if (ev.key === 's') {
+                this.speech();
+            }
         });
 
         if (!tactJs) {
@@ -52,11 +63,9 @@ class App {
         tactJs.addListener(function (msg) {
             if (msg.status === 'Connected') {
                 console.log('tact is connected');
-                this.tactJsRunning = true;
                 this.hit();
             } else if (msg.status === 'Disconnected') {
                 console.log('tact is disconnected');
-                this.tactJsRunning = false;
             } else if (msg.status === 'Connecting') {
                 console.log('tact is connecting');
             }
@@ -74,18 +83,43 @@ class App {
     hit() {
         console.log('hit');
         // TODO: remove this - just testing
-        if (this.tactJsRunning) {
-            var key = 'dot';
-            var position = PositionType.VestFront;
-            var points = [{
-                index: 10,
-                intensity: 100
-            }];
-            var durationMillis = 1000; // 1000ms
-                var errorCode = tactJs.submitDot(key, position, points, durationMillis);
-            if (errorCode !== 0) {
-                console.log('tact error: ' + errorCode);
+
+        var key = 'dot';
+        var position = PositionType.VestFront;
+        var points = [{
+            index: 10,
+            intensity: 100
+        }];
+        var durationMillis = 1000; // 1000ms
+        var errorCode = tactJs.submitDot(key, position, points, durationMillis);
+        if (errorCode !== 0) {
+            console.log('tact error: ' + errorCode);
+        }
+
+    }
+
+    speech() {
+        console.log('speech');
+        if ('speechSynthesis' in window) {
+            // speechSynthesis.speak(new SpeechSynthesisUtterance('Hello World'));
+            console.log("speechSynthesis supported")
+            var msg = new SpeechSynthesisUtterance();
+            var voices = speechSynthesis.getVoices();
+            if (voices.length > 0)
+            {
+                msg.voice = voices[5]; 
+            // console.log(voices)
+            //msg.volume = 1; // From 0 to 1
+            //msg.rate = 1; // From 0.1 to 10
+            //msg.pitch = 2; // From 0 to 2
+                msg.text = "Good morning, Dave. I'm sorry I can't do that.";
+                msg.lang = 'en';
+                speechSynthesis.speak(msg);
             }
-        }    }
+        } else {
+            // Speech Synthesis Not Supported
+            console.log("Sorry, your browser doesn't support text to speech!");
+        }
+    }
 }
 new App();
