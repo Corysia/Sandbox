@@ -5,6 +5,8 @@ import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBu
 import tactJs, { PositionType } from "tact-js";
 
 class App {
+    tactJsRunning: boolean = false;
+
     constructor() {
         // create the canvas html element and attach it to the webpage
         var canvas = document.createElement("canvas");
@@ -16,8 +18,6 @@ class App {
         // initialize babylon scene and engine
         var engine = new Engine(canvas, true);
         var scene = new Scene(engine);
-
-        var tactJsRunning = false;
 
         var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
         camera.attachControl(canvas, true);
@@ -52,10 +52,11 @@ class App {
         tactJs.addListener(function (msg) {
             if (msg.status === 'Connected') {
                 console.log('tact is connected');
-                tactJsRunning = true;
+                this.tactJsRunning = true;
+                this.hit();
             } else if (msg.status === 'Disconnected') {
                 console.log('tact is disconnected');
-                tactJsRunning = false;
+                this.tactJsRunning = false;
             } else if (msg.status === 'Connecting') {
                 console.log('tact is connecting');
             }
@@ -64,8 +65,16 @@ class App {
             }
         });
 
+        // run the main render loop
+        engine.runRenderLoop(() => {
+            scene.render();
+        });
+    }
+
+    hit() {
+        console.log('hit');
         // TODO: remove this - just testing
-        if (tactJsRunning) {
+        if (this.tactJsRunning) {
             var key = 'dot';
             var position = PositionType.VestFront;
             var points = [{
@@ -77,12 +86,6 @@ class App {
             if (errorCode !== 0) {
                 console.log('tact error: ' + errorCode);
             }
-        }
-
-        // run the main render loop
-        engine.runRenderLoop(() => {
-            scene.render();
-        });
-    }
+        }    }
 }
 new App();
