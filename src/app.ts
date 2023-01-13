@@ -16,11 +16,7 @@ class App {
         canvas.id = "gameCanvas";
         document.body.appendChild(canvas);
         new SpeechSynthesisUtterance();
-
-        document.onload = () => {
-            console.log("document loaded");
-            this.speech();
-        }
+        this.setupTact();
 
         // initialize babylon scene and engine
         var engine = new Engine(canvas, true);
@@ -53,31 +49,6 @@ class App {
             }
         });
 
-        if (!tactJs) {
-            console.log('tact is not supported');
-            return;
-        }
-
-        // Enable tactJs
-        console.log("starting tactJs");
-        tactJs.turnOffAll();
-        tactJs.addListener((msg) => {
-            if (msg.status === 'Connected') {
-                console.log('tact is connected');
-                this.tsConnected = true;
-            } else if (msg.status === 'Disconnected') {
-                if (this.tsConnected) {
-                    console.log('tact is disconnected');
-                }
-                this.tsConnected = false;
-            } else if (msg.status === 'Connecting') {
-                console.log('tact is connecting');
-            }
-            else if (msg.status === 'Error') {
-                console.log('tact error: ' + msg);
-            }
-        });
-
         // run the main render loop
         engine.runRenderLoop(() => {
             scene.render();
@@ -106,6 +77,33 @@ class App {
 
     }
 
+    setupTact() {
+        if (!tactJs) {
+            console.log('tact is not supported');
+            return;
+        }
+
+        // Enable tactJs
+        console.log("starting tactJs");
+        tactJs.turnOffAll();
+        tactJs.addListener((msg) => {
+            if (msg.status === 'Connected') {
+                console.log('tact is connected');
+                this.tsConnected = true;
+            } else if (msg.status === 'Disconnected') {
+                if (this.tsConnected) {
+                    console.log('tact is disconnected');
+                }
+                this.tsConnected = false;
+            } else if (msg.status === 'Connecting') {
+                console.log('tact is connecting');
+            }
+            else if (msg.status === 'Error') {
+                console.log('tact error: ' + msg);
+            }
+        });
+    }
+
     speech() {
         console.log('speech');
         if ('speechSynthesis' in window) {
@@ -113,13 +111,12 @@ class App {
             console.log("speechSynthesis supported")
             var msg = new SpeechSynthesisUtterance();
             var voices = speechSynthesis.getVoices();
-            if (voices.length > 0)
-            {
-                msg.voice = voices[5]; 
-            // console.log(voices)
-            //msg.volume = 1; // From 0 to 1
-            //msg.rate = 1; // From 0.1 to 10
-            //msg.pitch = 2; // From 0 to 2
+            if (voices.length > 0) {
+                msg.voice = voices[5];
+                // console.log(voices)
+                //msg.volume = 1; // From 0 to 1
+                //msg.rate = 1; // From 0.1 to 10
+                //msg.pitch = 2; // From 0 to 2
                 msg.text = "Good morning, Dave. I'm sorry I can't do that.";
                 msg.lang = 'en';
                 speechSynthesis.speak(msg);
