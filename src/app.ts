@@ -2,9 +2,11 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
-import tactJs, { PositionType } from "tact-js";
+import tactJs, { ErrorCode, PositionType } from "tact-js";
 
 class App {
+
+    tsConnected: boolean = false;
 
     constructor() {
         // create the canvas html element and attach it to the webpage
@@ -59,13 +61,15 @@ class App {
         // Enable tactJs
         console.log("starting tactJs");
         tactJs.turnOffAll();
-
-        tactJs.addListener(function (msg) {
+        tactJs.addListener((msg) => {
             if (msg.status === 'Connected') {
                 console.log('tact is connected');
-                this.hit();
+                this.tsConnected = true;
             } else if (msg.status === 'Disconnected') {
-                console.log('tact is disconnected');
+                if (this.tsConnected) {
+                    console.log('tact is disconnected');
+                }
+                this.tsConnected = false;
             } else if (msg.status === 'Connecting') {
                 console.log('tact is connecting');
             }
@@ -82,6 +86,10 @@ class App {
 
     hit() {
         console.log('hit');
+        if (!this.tsConnected) {
+            console.log('tact is not connected');
+            return;
+        }
         // TODO: remove this - just testing
 
         var key = 'dot';
@@ -91,7 +99,7 @@ class App {
             intensity: 100
         }];
         var durationMillis = 1000; // 1000ms
-        var errorCode = tactJs.submitDot(key, position, points, durationMillis);
+        var errorCode: ErrorCode = tactJs.submitDot(key, position, points, durationMillis);
         if (errorCode !== 0) {
             console.log('tact error: ' + errorCode);
         }
